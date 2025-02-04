@@ -1,0 +1,8 @@
+<% day_markings = DayMarking.where(marked_on: date) %>
+<% if day_markings.any? %>
+  <% day_markings.each do |marking| %>
+    <p><%= marking.user.email %></p>
+  <% end %>
+<% else %>
+  <p>Nessuna marcatura</p>
+<% end %>

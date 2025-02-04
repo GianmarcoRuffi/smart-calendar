@@ -1,23 +1,28 @@
 <h1>Calendario <%= @year %></h1>
 
-<%= month_calendar(date: Date.today) do |date| %>
-  <div class="day-cell" data-date="<%= date %>">
-    <%= date.day %>
-    <div class="markings">
-      <% # Mostra i nomi degli utenti che hanno segnato questo giorno %>
-      <% @day_markings.select { |dm| dm.marked_on == date }.each do |marking| %>
-        <p><%= marking.user.email %></p>
-      <% end %>
+<div class="calendar">
+  <%= month_calendar(date: Date.today) do |date| %>
+    <div class="day-cell" data-date="<%= date %>">
+      <div class="day-number"><%= date.day %></div>
+      <div class="markings">
+        <%# Rende il partial per le marcature relative a questo giorno %>
+        <%= render partial: 'calendars/markings', locals: { date: date } %>
+      </div>
     </div>
-  </div>
-<% end %>
+  <% end %>
+</div>
 
 <script>
 document.addEventListener('turbolinks:load', () => {
-  console.log("turbolinks:load evento ricevuto");
+  console.log("✅ Turbolinks load event received");
+
   document.querySelectorAll('.day-cell').forEach(cell => {
+    console.log("🔍 Found day-cell:", cell);
+
     cell.addEventListener('click', () => {
       const date = cell.getAttribute('data-date');
+      console.log("📅 Clicked on date:", date);
+
       fetch("<%= toggle_day_marking_path %>", {
         method: "POST",
         headers: {
@@ -26,13 +31,25 @@ document.addEventListener('turbolinks:load', () => {
         },
         body: JSON.stringify({ date: date })
       })
-      .then(response => response.json())
+      .then(response => {
+        console.log("📩 Received response:", response);
+        return response.json();
+      })
       .then(data => {
-        // Aggiorna la cella, per esempio cambiando il colore o ricaricando le marcature
-        cell.querySelector('.markings').innerHTML = data.html;
+        console.log("📜 Parsed JSON response:", data);
+        
+        // Controlla se la chiave `html` è presente nella risposta
+        if (data.html) {
+          cell.querySelector('.markings').innerHTML = data.html;
+          console.log("✅ Successfully updated markings for", date);
+        } else {
+          console.error("❌ No HTML returned from server!", data);
+        }
+      })
+      .catch(error => {
+        console.error("⚠️ Fetch error:", error);
       });
     });
   });
 });
-
 </script>
