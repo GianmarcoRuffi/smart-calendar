@@ -2,20 +2,41 @@ class DayMarkingsController < ApplicationController
   before_action :authenticate_user!
   
   def toggle
-    # Ricevi la data dal parametro, ad esempio in formato ISO (YYYY-MM-DD)
+    # Azione per l’utente normale: opera sulle proprie marcature
     date = Date.parse(params[:date])
-    
-    # Se l'utente ha già segnato quel giorno, elimina la marcatura
     marking = current_user.day_markings.find_by(marked_on: date)
+    
     if marking
       marking.destroy
     else
       current_user.day_markings.create(marked_on: date)
     end
 
-    # Per AJAX, puoi restituire (ad esempio) un JSON oppure reindirizzare
     respond_to do |format|
       format.js   # toggle.js.erb per aggiornare dinamicamente la vista
+      format.html { redirect_to calendars_path }
+    end
+  end
+
+  def admin_toggle
+    # Questa azione permette all’admin di operare sulle marcature di altri utenti.
+    unless current_user.admin?
+      redirect_to calendars_path, alert: "Accesso non autorizzato" and return
+    end
+
+    # L’admin invia anche il parametro user_id per specificare su chi agire.
+    user = User.find(params[:user_id])
+    date = Date.parse(params[:date])
+    marking = DayMarking.find_by(user: user, marked_on: date)
+
+    if marking
+      marking.destroy
+    else
+      DayMarking.create(user: user, marked_on: date)
+    end
+
+    respond_to do |format|
+      format.js   # admin_toggle.js.erb per aggiornare dinamicamente la vista se usi AJAX
       format.html { redirect_to calendars_path }
     end
   end

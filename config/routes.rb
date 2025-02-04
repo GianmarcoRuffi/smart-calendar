@@ -8,6 +8,7 @@ Rails.application.routes.draw do
 
   resources :calendars, only: [:index]
   post "day_markings/toggle", to: "day_markings#toggle", as: "toggle_day_marking"
+   post 'day_markings/admin_toggle', to: 'day_markings#admin_toggle', as: 'admin_toggle_day_marking'
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.

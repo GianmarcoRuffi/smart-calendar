@@ -11,3 +11,26 @@
     </div>
   </div>
 <% end %>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.day-cell').forEach(cell => {
+      cell.addEventListener('click', () => {
+        const date = cell.getAttribute('data-date');
+        fetch("<%= toggle_day_marking_path %>", {
+          method: "POST",
+          headers: {
+            "X-CSRF-Token": "<%= form_authenticity_token %>",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ date: date })
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Aggiorna la cella, per esempio cambiando il colore o ricaricando le marcature
+          cell.querySelector('.markings').innerHTML = data.html;
+        });
+      });
+    });
+  });
+</script>
