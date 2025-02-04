@@ -1,0 +1,13 @@
+<h1>Calendario <%= @year %></h1>
+
+<%= month_calendar(date: Date.today) do |date| %>
+  <div class="day-cell" data-date="<%= date %>">
+    <%= date.day %>
+    <div class="markings">
+      <% # Mostra i nomi degli utenti che hanno segnato questo giorno %>
+      <% @day_markings.select { |dm| dm.marked_on == date }.each do |marking| %>
+        <p><%= marking.user.email %></p>
+      <% end %>
+    </div>
+  </div>
+<% end %>

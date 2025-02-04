@@ -1,6 +1,13 @@
 Rails.application.routes.draw do
+  get "day_markings/toggle"
+  get "calendars/index"
   devise_for :users
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+
+  root to: "calendars#index"
+
+  resources :calendars, only: [:index]
+  post "day_markings/toggle", to: "day_markings#toggle", as: "toggle_day_marking"
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
