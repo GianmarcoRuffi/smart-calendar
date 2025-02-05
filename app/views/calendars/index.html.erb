@@ -13,9 +13,10 @@
 </div>
 
 <script>
-document.addEventListener('turbolinks:load', () => {
-  console.log("✅ Turbolinks load event received");
+document.addEventListener('DOMContentLoaded', () => {
+  console.log("✅ JavaScript is working!");
 
+  // Aggiungi evento al click per tutte le celle del calendario
   document.querySelectorAll('.day-cell').forEach(cell => {
     console.log("🔍 Found day-cell:", cell);
 
@@ -23,6 +24,7 @@ document.addEventListener('turbolinks:load', () => {
       const date = cell.getAttribute('data-date');
       console.log("📅 Clicked on date:", date);
 
+      // Effettua la chiamata Fetch
       fetch("<%= toggle_day_marking_path %>", {
         method: "POST",
         headers: {
@@ -31,10 +33,7 @@ document.addEventListener('turbolinks:load', () => {
         },
         body: JSON.stringify({ date: date })
       })
-      .then(response => {
-        console.log("📩 Received response:", response);
-        return response.json();
-      })
+      .then(response => response.json())  // Assicurati che la risposta sia JSON
       .then(data => {
         console.log("📜 Parsed JSON response:", data);
         
